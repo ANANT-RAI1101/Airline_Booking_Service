@@ -7,11 +7,11 @@ class ServiceError extends Error{
         statusCode=StatusCodes.INTERNAL_SERVER_ERROR
     ){
         super();
-         this.name = "Service error";
+        this.name = "Service error";
         this.message = message;
         this.explanation = explanation;
         this.statusCode = statusCode;
     }
 }
 
-module.exports=ServiceError;
+module.exports=ServiceError; 
