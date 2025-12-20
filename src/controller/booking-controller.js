@@ -21,9 +21,28 @@ const create = async (req, res) => {
 
         })
     }
+}
 
+const cancel=async(req,res)=>{
+    try {
+        const response=await bookingService.cancel(req.params.id);
+        return res.status(StatusCodes.OK).json({
+            message: 'Successfully cancelled booking',
+            success: true,
+            err: {},
+            data: response
+        })
+    } catch (error) {
+        return res.status(error.statusCode).json({
+            message:error.message,
+            success:false,
+            data:{},
+            err:error.explanation
+        })
+    }
 }
 
 module.exports={
-    create
+    create,
+    cancel
 }
