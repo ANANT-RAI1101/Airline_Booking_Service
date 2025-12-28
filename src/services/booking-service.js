@@ -2,8 +2,9 @@ const BookingRepository = require("../repository/booking-repository");
 
 const { StatusCodes } = require('http-status-codes');
 const axios = require('axios');
-const { FLIGHT_SERVICE_PATH } = require('../config/serverConfig');
-const { AppError, ServiceError } = require('../utils/error/index');
+const { FLIGHT_SERVICE_PATH , REMINDER_BINDING_KEY ,AUTH_SERVICE_PATH}  = require('../config/serverConfig');
+const {  ServiceError } = require('../utils/error/index');
+const { publishMessage } = require("../utils/message-queue")
 
 class BookingService {
     constructor() {
@@ -28,7 +29,21 @@ class BookingService {
             })
             const updateFlightURL = `${FLIGHT_SERVICE_PATH}/api/v1/flight/${flightId}`
             await axios.patch(updateFlightURL, { totalSeats: flightData.totalSeats - booking.noOfSeats });
-            const finalBooking = await this.bookingRepository.update(booking.id, { status: "Booked" })
+            const finalBooking = await this.bookingRepository.update(booking.id, { status: "Booked" });
+            const userId=booking.userId;
+            const userURL= `${AUTH_SERVICE_PATH}/api/v1/user/${userId}` 
+            const userResponse=await axios.get(userURL);
+            const userData=userResponse.data.data;
+            
+            console.log("Email fetched:", userData?.email);
+            const ticketPayload={
+                subject:"Ticket Conformation",
+                content:"Your Flight Ticket has been confirmed",
+                recepientEmail:userData.email, 
+                status:"PENDING",
+                notificationTime:new Date()
+            }
+            publishMessage(REMINDER_BINDING_KEY,JSON.stringify(ticketPayload));
             return finalBooking;
 
         } catch (error) {
