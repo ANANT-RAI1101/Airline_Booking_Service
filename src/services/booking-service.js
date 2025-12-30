@@ -18,6 +18,7 @@ class BookingService {
             const response = await axios.get(flightURL);
             const flightData = response.data.data;
             const priceOfTheFlight = flightData.price;
+            const departureTime= flightData.departure_date_time;
             if (data.noOfSeats > flightData.totalSeats) {
                 throw new ServiceError("Insufficient seats in the flight",
                     "Not enough seats available for booking",
@@ -41,7 +42,8 @@ class BookingService {
                 content:"Your Flight Ticket has been confirmed",
                 recepientEmail:userData.email, 
                 status:"PENDING",
-                notificationTime:new Date()
+                notificationTime:new Date(),
+                departureTime:departureTime
             }
             publishMessage(REMINDER_BINDING_KEY,JSON.stringify(ticketPayload));
             return finalBooking;
