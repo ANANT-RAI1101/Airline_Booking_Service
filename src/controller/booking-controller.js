@@ -9,15 +9,7 @@ class BookingRepository {
     constructor() {
     }
 
-    async sendMessageToQueue(req,res){
-        
-            const channel=await createChannel();
-            const data={message: 'Success'};
-            publishMessage(channel,REMINDER_BINDING_KEY,JSON.stringify(data));
-            return res.status(200).json({
-            message: 'Succesfully published the event'
-        });
-    }
+    
 
     async create(req, res) {
         try {
